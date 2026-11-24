@@ -16,17 +16,6 @@
 * [Building and testing](#building-and-testing)
 * [Copyright and License](#copyright-and-license)
 
-## Is Cmdow Malware?<a name="is-cmdow-malware"></a>
-
-**Of course not!** However, not everyone agrees... One of Cmdow's many features allow the user to hide program windows which has led to 40% of anti-virus vendors classifying Cmdow as anything from a hacking tool to a trojan<sup>[&dagger;](#trojan)</sup>. On the other hand, 60% of anti-virus vendors regard Cmdow as completely safe.
-
-You can view the anti-virus scan results yourself. Download and extract the latest version of the Cmdow archive, then upload cmdow.exe to [VirusTotal](https://virustotal.com/). You'll end up at a page like this: 
-[https://virustotal.com/en/file/767b877e735c425bf05c34683356abfde4070b092f17a4741ea5ac490611f3de/analysis/](https://virustotal.com/en/file/767b877e735c425bf05c34683356abfde4070b092f17a4741ea5ac490611f3de/analysis/) (note, the long hexadecimal string in the URL matches the [SHA256 checksum](https://en.wikipedia.org/wiki/Sha1sum) of cmdow.exe, v1.4.8 in this instance).
-
-Obviously, if you have any doubts about the safety of Cmdow then don't use it or audit the source code yourself. Auditing should be fairly straightforward as the code is self explanatory with liberal comments and there is no assembly or binary blobs. It compiles without errors or warnings using the free [Code::Blocks](http://www.codeblocks.org/) IDE. There is even a Code::Blocks project file ([cmdow.cbp](https://github.com/ritchielawrence/cmdow/blob/master/cmdow.cbp)) included in the Cmdow download.
-
-<sup><a name="trojan">&dagger;</a></sup> Ten vendors actually regard passing a zero to the Windows API function [ShowWindowAsync](https://msdn.microsoft.com/en-us/library/windows/desktop/ms633549%28v=vs.85%29.aspx) as enough to create a trojan!
-
 ## Synopsis<a name="synopsis"></a>
 
 Cmdow is a Win32 commandline utility for NT4/2000/XP/2003/2008/7 that allows windows to be listed, moved, resized, renamed, hidden/unhidden, disabled/enabled, minimized, maximized, restored, activated/inactivated, closed, killed and more.
@@ -414,6 +403,18 @@ When I use Cmdow at a command prompt or in a batch file and try to change the co
 How can I undo the effects of tiling, cascading or minimizing all windows?
 
 > In version 1.4.2 the /UM switch has been superseded by /UW. This new switch will undo the effect of tiling/cascading and minimizing all windows. To maintain compatability with existing scripts, the /UM switch can still be used even though it's no longer documented on Cmdow's helpscreen. /UM now has exactly the same effect as /UW.
+>
+> ## Is Cmdow Malware?<a name="is-cmdow-malware"></a>
+
+**Of course not!** However, not everyone agrees... One of Cmdow's many features allow the user to hide program windows which has led to 40% of anti-virus vendors classifying Cmdow as anything from a hacking tool to a trojan<sup>[&dagger;](#trojan)</sup>. On the other hand, 60% of anti-virus vendors regard Cmdow as completely safe.
+
+You can view the anti-virus scan results yourself. Download and extract the latest version of the Cmdow archive, then upload cmdow.exe to [VirusTotal](https://virustotal.com/). You'll end up at a page like this: 
+[https://virustotal.com/en/file/767b877e735c425bf05c34683356abfde4070b092f17a4741ea5ac490611f3de/analysis/](https://virustotal.com/en/file/767b877e735c425bf05c34683356abfde4070b092f17a4741ea5ac490611f3de/analysis/) (note, the long hexadecimal string in the URL matches the [SHA256 checksum](https://en.wikipedia.org/wiki/Sha1sum) of cmdow.exe, v1.4.8 in this instance).
+
+Obviously, if you have any doubts about the safety of Cmdow then don't use it or audit the source code yourself. Auditing should be fairly straightforward as the code is self explanatory with liberal comments and there is no assembly or binary blobs. It compiles without errors or warnings using the free [Code::Blocks](http://www.codeblocks.org/) IDE. There is even a Code::Blocks project file ([cmdow.cbp](https://github.com/ritchielawrence/cmdow/blob/master/cmdow.cbp)) included in the Cmdow download.
+
+<sup><a name="trojan">&dagger;</a></sup> Ten vendors actually regard passing a zero to the Windows API function [ShowWindowAsync](https://msdn.microsoft.com/en-us/library/windows/desktop/ms633549%28v=vs.85%29.aspx) as enough to create a trojan!
+
 
 ## Screenshots<a name="screenshots"></a>
 
