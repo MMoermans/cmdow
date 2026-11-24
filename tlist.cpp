@@ -123,8 +123,8 @@ int GetTaskList(struct TLIST *tlist)
 
 	dwProcessIdCounter = 0; /* added by me as var could be used without init */
 
-    pObj = (PPERF_OBJECT_TYPE) ((DWORD)pPerf + pPerf->HeaderLength);
-    pCounterDef = (PPERF_COUNTER_DEFINITION) ((DWORD)pObj + pObj->HeaderLength);
+    pObj = (PPERF_OBJECT_TYPE) ((DWORD_PTR)pPerf + pPerf->HeaderLength);
+    pCounterDef = (PPERF_COUNTER_DEFINITION) ((DWORD_PTR)pObj + pObj->HeaderLength);
     for (i=0; i<(DWORD)pObj->NumCounters; i++) {
         if (pCounterDef->CounterNameTitleIndex == dwProcessIdTitle) {
             dwProcessIdCounter = pCounterDef->CounterOffset;
@@ -135,11 +135,11 @@ int GetTaskList(struct TLIST *tlist)
 
     dwNumTasks = (DWORD) pObj->NumInstances;
 
-    pInst = (PPERF_INSTANCE_DEFINITION) ((DWORD)pObj + pObj->DefinitionLength);
+    pInst = (PPERF_INSTANCE_DEFINITION) ((DWORD_PTR)pObj + pObj->DefinitionLength);
 
     for (i=0; i<dwNumTasks; i++) {
 
-        p = (LPSTR) ((DWORD)pInst + pInst->NameOffset);
+        p = (LPSTR) ((DWORD_PTR)pInst + pInst->NameOffset);
         rc = WideCharToMultiByte( CP_ACP, 0, (LPCWSTR)p, -1, szProcessName,
 			sizeof(szProcessName), NULL, NULL);
 
@@ -151,9 +151,9 @@ int GetTaskList(struct TLIST *tlist)
 		lstrcpy( tlist->ProcessName, szProcessName );
 
 		// load Pid into tlist
-	    pCounter = (PPERF_COUNTER_BLOCK) ((DWORD)pInst + pInst->ByteLength);
-        tlist->dwProcessId = *((LPDWORD) ((DWORD)pCounter + dwProcessIdCounter));
-        pInst = (PPERF_INSTANCE_DEFINITION) ((DWORD)pCounter + pCounter->ByteLength);
+	    pCounter = (PPERF_COUNTER_BLOCK) ((DWORD_PTR)pInst + pInst->ByteLength);
+        tlist->dwProcessId = *((LPDWORD) ((DWORD_PTR)pCounter + dwProcessIdCounter));
+        pInst = (PPERF_INSTANCE_DEFINITION) ((DWORD_PTR)pCounter + pCounter->ByteLength);
 
 		// create a new tlist record
 		tlist->next = (struct TLIST *) HeapAlloc(GetProcessHeap(), 0, sizeof(struct TLIST));

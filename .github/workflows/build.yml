@@ -23,9 +23,9 @@ jobs:
         shell: bash
         run: |
           g++ --version | head -1
-          g++ -O2 -Wall -static -s -o cmdow.exe args.cpp help.cpp main.cpp tlist.cpp wlist.cpp
-          g++ -O2 -Wall -static -s -o tests/testwin.exe tests/testwin.cpp
-          g++ -O2 -Wall -static -s -o tests/probe.exe tests/probe.cpp
+          g++ -O2 -Wall -Wno-register -static -s -o cmdow.exe args.cpp help.cpp main.cpp tlist.cpp wlist.cpp
+          g++ -O2 -Wall -Wno-register -static -s -o tests/testwin.exe tests/testwin.cpp
+          g++ -O2 -Wall -Wno-register -static -s -o tests/probe.exe tests/probe.cpp
 
       - name: Build with MSVC
         if: matrix.toolchain == 'msvc'

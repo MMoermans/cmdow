@@ -597,7 +597,7 @@ void RunWin(struct WLIST *w, struct ARGS *a)
 	CloseHandle(pi.hThread);*/
 //	printf("file [%s], params [%s]\n", a->file, a->params);
 
-	RetVal = (int) ShellExecute(NULL, NULL, a->file, a->params, NULL, a->sw_state);
+	RetVal = (int) (INT_PTR) ShellExecute(NULL, NULL, a->file, a->params, NULL, a->sw_state);
 	if(RetVal < SHELLEXEC_SUCCESS) Quit(EXEERR);
 }
 

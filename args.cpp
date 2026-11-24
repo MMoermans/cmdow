@@ -279,7 +279,7 @@ HWND atoHandle(const char *src)
 
 	// string must begin with 0x or 0X
 	if( strncmp("0x", src, 2) && strncmp("0X", src, 2) ) return (HWND) (0);
-	h = (HWND) strtoul(src, &p, 16);
+	h = (HWND) (UINT_PTR) strtoul(src, &p, 16);
 	// all characters must be interpreted
 	if(*p) return (HWND) (0);
 	else return h;
