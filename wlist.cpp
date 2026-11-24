@@ -260,7 +260,7 @@ void LstWin(struct WLIST *w, struct ARGS *a)
 	EnabledDisabled = (w->styles & WS_DISABLED) ? "Dis" : "Ena";
 
 	printf("0x%.*lX %*i %*lu %s %s %s %s ",
-		   len_handle, (unsigned long) w->hwnd,
+		   len_handle, (unsigned long) (DWORD_PTR) w->hwnd,
 		   len_level, w->level,
 		   len_pid, (unsigned long) w->pid,
 	       MinMaxRes, ActiveInactive, EnabledDisabled, VisibleHidden);
@@ -494,7 +494,7 @@ void RenWin(struct WLIST *w, struct ARGS *a)
 	//
 	// Build the commandline to rename this console window
 	//
-	ltoa((long) a->myhwnd, buf, 16);
+	ltoa((long) (DWORD_PTR) a->myhwnd, buf, 16);
 
 	i = lstrlen(a->exename);
 	i += lstrlen(" 0x");
