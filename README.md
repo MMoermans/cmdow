@@ -1,3 +1,9 @@
+> **This is a fork** of [ritchielawrence/cmdow](https://github.com/ritchielawrence/cmdow) (MIT licensed).
+> It adds three window commands, `/TRN` (opacity), `/CEN` (centre on its monitor) and `/SNAP`
+> (fill half of the monitor), and fixes the code so it builds and works as a native **64-bit**
+> program with current MinGW-w64 and MSVC. Every push is built with both and tested against a real
+> window by [GitHub Actions](https://github.com/MMoermans/cmdow/actions). See [Revisions](#revisions).
+
 ## Table of Contents
 
 * [Is Cmdow Malware?](#is-cmdow-malware)
@@ -7,6 +13,7 @@
 * [FAQs](#faqs)
 * [Screenshots](#screenshots)
 * [Revisions](#revisions)
+* [Building and testing](#building-and-testing)
 * [Copyright and License](#copyright-and-license)
 
 ## Is Cmdow Malware?<a name="is-cmdow-malware"></a>
@@ -113,7 +120,7 @@ possible. Improper use may cause unexpected results and system instability.
 <pre>
   CMDOW window {[/ACT] [/INA] [/ENA] [/DIS] [/VIS] [/HID] [/MIN] [/MAX] [/RES]}
   CMDOW window {[/REN newcaption] [/TOP] [/NOT] [/MOV left top]
-        [/SIZ width height] [/CLS] [/END]}
+        [/SIZ width height] [/TRN percent] [/CEN] [/SNAP side] [/CLS] [/END]}
 
   window  Window to act on. Specify a window by its handle (in hex format, eg
           0x1A0142) or caption (window title). Caption is case insensitive.
@@ -161,6 +168,15 @@ possible. Improper use may cause unexpected results and system instability.
           smaller using /SIZ than they could if using conventional methods. You
           should not resize a minimized or maximized window without first
           restoring it.
+  /TRN    Sets the opacity of the specified window as a percentage from 1 to
+          100, making it see-through. 100 is fully opaque (the normal state).
+          Zero is not allowed, as the window could not be found again.
+  /CEN    Centres the specified window on the work area (the screen less the
+          taskbar) of the monitor it is on. Minimized, maximized and child
+          windows are left alone.
+  /SNAP   Moves and resizes the specified window to fill the left, right,
+          top or bottom half of the work area of the monitor it is on. Eg
+          /SNAP left. Minimized, maximized and child windows are left alone.
   /CLS    Politely asks the specified window to close. Most applications will
           respond to this request, although some may display a message box
           asking you what to do with unsaved work.
@@ -342,6 +358,26 @@ if "%wstate%"=="Max" cmdow @ /max
 echo Here we are again, back in our maximised window!
 ```
 
+To make a window half see-through, put it on top of the others, and back to normal later:-
+
+```batch
+cmdow "Untitled - Notepad" /trn 60 /top
+cmdow "Untitled - Notepad" /trn 100 /not
+```
+
+To resize a window and centre it on the screen it is on:-
+
+```batch
+cmdow "Untitled - Notepad" /siz 800 600 /cen
+```
+
+To tile two windows side by side on the same monitor:-
+
+```batch
+cmdow "Untitled - Notepad" /snap left
+cmdow "Calculator" /snap right
+```
+
 ## FAQs<a name="faqs"></a>
 
 How can I filter on image name and caption?
@@ -397,6 +433,7 @@ How can I undo the effects of tiling, cascading or minimizing all windows?
 
 Revision | Date | Changes
 ---|---|---
+1.5.0 | 2026-11-24 | Fork. Added /TRN (opacity), /CEN (centre on monitor) and /SNAP (fill half of a monitor). Fixed 64-bit issues (pointer arithmetic on performance data, handle casts) so Cmdow builds and works natively as 64-bit with MinGW-w64 and MSVC. Added automated builds and tests that run against a real window.
 1.4.8 | 2014-12-30 | Help page typos corrected. Output can handle 5-digit PIDs.
 1.4.7 | 2014-12-29 | Wildcards can now be used to filter window captions. Also now possible to perform actions on multiple windows. Handle display is extended to eight digits. Level is dynamically sized. Class name is dynamically sized. Newlines in the caption are converted to 1.4.4 | 2014-11-08 | Cmdow is now open source software released under the MIT license.
 1.4.3 | 2004-12-19 | Fixed bug where renaming the current console window would fail if the new caption title contained whitespace. Sizes are based on the entire window list, not just what is displayed. Help pages updated. Internally: Remove process name length test, as WideCharToMultiByte already restricts it. Combined multiple printfs. Substituted some if/else assignments for ternary operator.
@@ -407,6 +444,27 @@ Revision | Date | Changes
 1.2 | 2002-10-29 | Fixed issue caused when conole windows have no title. Enhance /AT feature to restore an activated window if it was minimized.
 1.1 | 2002-02-25 | Added /RUN command.
 1.0 | 2001-12-20 | Cmdow created.
+
+## Building and testing
+
+MinGW-w64 or Visual Studio (both are tested in CI, as 64-bit):-
+
+```batch
+g++ -O2 -static -s -o cmdow.exe args.cpp help.cpp main.cpp tlist.cpp wlist.cpp
+```
+
+```batch
+cl /EHsc /O2 /Fe:cmdow.exe args.cpp help.cpp main.cpp tlist.cpp wlist.cpp user32.lib advapi32.lib shell32.lib
+```
+
+The tests open a plain window (`tests/testwin.cpp`), run Cmdow against it and read the real window state back with an
+independent program (`tests/probe.cpp`), so they check what happened to the window, not what Cmdow printed:-
+
+```batch
+g++ -static -o tests/testwin.exe tests/testwin.cpp
+g++ -static -o tests/probe.exe tests/probe.cpp
+powershell -File tests\run-tests.ps1 -Cmdow .\cmdow.exe -TestWin tests\testwin.exe -Probe tests\probe.exe
+```
 
 ## Copyright and License<a name="copyright-and-license"></a>
 
