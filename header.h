@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include <shellapi.h>
 #include <winperf.h>
@@ -35,6 +36,8 @@
 #define TASKOL		10		/* Too many tasks have been specified */
 #define EXEERR		11		/* Unable to execute/open specified file */
 #define VERERR		12      /* Only the /? and /RUN commands are supported on W95/98/ME platforms */
+#define TRNERR		13		/* /TRN command requires an opacity percentage from 1 to 100 */
+#define SNPERR		14		/* /SNAP command requires left, right, top or bottom */
 
 
 
@@ -50,7 +53,12 @@ enum TASK {
 	REN, MOV, SIZ,
 	CLS, END, RUN,
 	TOP, NOT,
+	TRN, CEN, SNP,
 	RCW
+};
+
+enum SNAPTO {							/* Where /SNAP puts a window */
+	SNAP_NONE = 0, SNAP_LEFT, SNAP_RIGHT, SNAP_TOP, SNAP_BOTTOM
 };
 
 enum LISTOPTS {
@@ -80,6 +88,8 @@ struct ARGS {
 	char			*params;		/* Commandline params used with /RUN */
 	int				sw_state;		/* How window is displayed, used with /RUN */
 	char			*helpcmd;		/* Holds command that user wants help with */
+	int				opacity;		/* Opacity in percent (1-100), used with /TRN */
+	int				snap;			/* One of enum SNAPTO, used with /SNAP */
 };
 
 struct WLIST {
@@ -105,6 +115,8 @@ int IsTask(enum TASK tasks[], enum TASK t);
 char *LoadString(char **dest, const char *src);
 HWND atoHandle(const char *);
 int atoCoord(const char *);
+int atoPercent(const char *);
+int atoSnap(const char *);
 char *GetArgs();
 char *GetRestCmdline(char *Cmd);
 
@@ -147,5 +159,8 @@ void EndWin(struct WLIST *w, struct ARGS *a);
 void RunWin(struct WLIST *w, struct ARGS *a);
 void TopWin(struct WLIST *w, struct ARGS *a);
 void NotWin(struct WLIST *w, struct ARGS *a);
+void TrnWin(struct WLIST *w, struct ARGS *a);
+void CenWin(struct WLIST *w, struct ARGS *a);
+void SnpWin(struct WLIST *w, struct ARGS *a);
 
 int __cdecl _ConvertCommandLineToArgcArgv( void );

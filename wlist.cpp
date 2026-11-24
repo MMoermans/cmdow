@@ -675,3 +675,77 @@ void NotWin(struct WLIST *w, struct ARGS *a)
 	);
 }
 
+//
+// Gets the work area (the monitor minus taskbar) of the monitor the window is mostly on.
+// Returns FALSE for windows that should not be positioned this way: child windows, and
+// minimized or maximized windows (as with /MOV, restore the window first)
+//
+static BOOL GetWorkArea(struct WLIST *w, RECT *work)
+{
+	MONITORINFO mi;
+	HMONITOR mon;
+
+	if( (w->level != 1) || (w->styles & (WS_MINIMIZE | WS_MAXIMIZE)) ) return FALSE;
+
+	mon = MonitorFromWindow(w->hwnd, MONITOR_DEFAULTTONEAREST);
+	ZeroMemory(&mi, sizeof mi);
+	mi.cbSize = sizeof mi;
+	if(!GetMonitorInfo(mon, &mi)) return FALSE;
+
+	*work = mi.rcWork;
+	return TRUE;
+}
+
+//
+// Set window opacity in percent, 1-100. 100 makes the window fully opaque again
+// (the layered window style is left alone, as the application may rely on it)
+//
+void TrnWin(struct WLIST *w, struct ARGS *a)
+{
+	LONG exstyles = GetWindowLong(w->hwnd, GWL_EXSTYLE);
+
+	if(!(exstyles & WS_EX_LAYERED)) SetWindowLong(w->hwnd, GWL_EXSTYLE, exstyles | WS_EX_LAYERED);
+	SetLayeredWindowAttributes(w->hwnd, 0, (BYTE) ((a->opacity * 255 + 50) / 100), LWA_ALPHA);
+}
+
+//
+// Centre the window on the work area of its monitor
+//
+void CenWin(struct WLIST *w, struct ARGS *a)
+{
+	RECT work;
+
+	if(!GetWorkArea(w, &work)) return;
+	MoveWindow(w->hwnd,
+		work.left + ((work.right - work.left) - w->width) / 2,
+		work.top + ((work.bottom - work.top) - w->height) / 2,
+		w->width, w->height, TRUE);
+}
+
+//
+// Snap the window to the left, right, top or bottom half of its monitor's work area
+//
+void SnpWin(struct WLIST *w, struct ARGS *a)
+{
+	RECT work;
+	int cx, cy;
+
+	if(!GetWorkArea(w, &work)) return;
+	cx = work.right - work.left;
+	cy = work.bottom - work.top;
+
+	switch(a->snap) {
+		case SNAP_LEFT:
+			MoveWindow(w->hwnd, work.left, work.top, cx / 2, cy, TRUE);
+			break;
+		case SNAP_RIGHT:
+			MoveWindow(w->hwnd, work.left + cx / 2, work.top, cx - cx / 2, cy, TRUE);
+			break;
+		case SNAP_TOP:
+			MoveWindow(w->hwnd, work.left, work.top, cx, cy / 2, TRUE);
+			break;
+		case SNAP_BOTTOM:
+			MoveWindow(w->hwnd, work.left, work.top + cy / 2, cx, cy - cy / 2, TRUE);
+			break;
+	}
+}

@@ -163,6 +163,9 @@ printf(
 			(!lstrcmpi("/height", cmd)) ||
 			(!lstrcmpi("/TOP", cmd)) ||
 			(!lstrcmpi("/NOT", cmd)) ||
+			(!lstrcmpi("/TRN", cmd)) ||
+			(!lstrcmpi("/CEN", cmd)) ||
+			(!lstrcmpi("/SNAP", cmd)) ||
 			(!lstrcmpi("/CLS", cmd)) ||
 			(!lstrcmpi("/END", cmd))) {
 		printf(
@@ -171,7 +174,8 @@ printf(
 		"possible. Improper use may cause unexpected results and system instability.\n\n"
 //		 ----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 		"  CMDOW window {[/REN newcaption] [/TOP] [/NOT] [/MOV left top]\n"
-		"        [/SIZ width height] [/CLS] [/END]}\n\n"
+		"        [/SIZ width height] [/TRN percent] [/CEN] [/SNAP side] [/CLS]\n"
+		"        [/END]}\n\n"
 //		 ----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 		"  window  Window to act on. Specify a window by its handle (in hex format, eg\n"
 		"          0x1A0142) or caption (window title). Caption is case insensitive.\n"
@@ -201,6 +205,16 @@ printf(
 		"          smaller using /SIZ than they could if using conventional methods. You\n"
 		"          should not resize a minimized or maximized window without first\n"
 		"          restoring it.\n");
+		printf(
+		"  /TRN    Sets the opacity of the specified window as a percentage from 1 to\n"
+		"          100, making it see-through. 100 is fully opaque (the normal state).\n"
+		"          Zero is not allowed, as the window could not be found again.\n"
+		"  /CEN    Centres the specified window on the work area (the screen less the\n"
+		"          taskbar) of the monitor it is on. Minimized, maximized and child\n"
+		"          windows are left alone.\n"
+		"  /SNAP   Moves and resizes the specified window to fill the left, right,\n"
+		"          top or bottom half of the work area of the monitor it is on. Eg\n"
+		"          /SNAP left. Minimized, maximized and child windows are left alone.\n");
 		printf(
 		"  /CLS    Politely asks the specified window to close. Most applications will\n"
 		"          respond to this request, although some may display a message box\n"
@@ -257,14 +271,15 @@ printf(
 	}
 	else {
 		printf(
-		"CMDOW [Version 1.4.8] Win32 Commandline Window Utility for NT4/2000/XP/7.\n"
-		"(C) Copyright 2001-2014 Ritchie Lawrence, http://www.commandline.co.uk.\n\n"
+		"CMDOW [Version 1.5.0] Win32 Commandline Window Utility for NT4/2000/XP/7.\n"
+		"(C) Copyright 2001-2014 Ritchie Lawrence, http://www.commandline.co.uk.\n"
+		"Fork with /TRN, /CEN and /SNAP: https://github.com/MMoermans/cmdow\n\n"
 //		 ----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 		"  CMDOW [window | /T] [/B] [/F] [/P]\n"
 		"  CMDOW /TH | /TV | /MA | /CW | /UW | /AT | /FS | /WM\n"
 		"  CMDOW window {[/ACT] [/INA] [/ENA] [/DIS] [/VIS] [/HID] [/MIN] [/MAX] [/RES]\n"
 		"        [/REN caption] [/TOP] [/NOT] [/MOV left top] [/SIZ width height] [/CLS]\n"
-		"        [/END]}\n"
+		"        [/TRN percent] [/CEN] [/SNAP left|right|top|bottom] [/END]}\n"
 		"  CMDOW /RUN [state] file [args]\n\n");
 //		 ----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 		printf(
@@ -287,7 +302,9 @@ printf(
 		"  /RES    Restore specified window.     /REN    Rename specified window.\n"
 		"  /TOP    Make window always on top.    /NOT    Make window not always on top.\n"
 		"  /MOV    Move specified window.        /SIZ    Resize specified window.\n"
-		"  /CLS    Close specified window.       /END    Kill process linked to window.\n\n");
+		"  /CLS    Close specified window.       /END    Kill process linked to window.\n"
+		"  /TRN    Set window opacity (1-100).   /CEN    Centre window on its monitor.\n"
+		"  /SNAP   Snap window to half its monitor: left, right, top or bottom.\n\n");
 //		 ----+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8
 		printf(
 		"  /RUN    Executes or opens specified file using associated application.\n"

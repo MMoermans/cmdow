@@ -201,6 +201,9 @@ int main(int argc, char* argv[])
 					case END: fp = EndWin; break;
 					case TOP: fp = TopWin; break;
 					case NOT: fp = NotWin; break;
+					case TRN: fp = TrnWin; break;
+					case CEN: fp = CenWin; break;
+					case SNP: fp = SnpWin; break;
 					default: fp = 0;
 				}
 				//

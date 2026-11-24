@@ -1,0 +1,52 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.toolchain }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [mingw, msvc]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build with MinGW
+        if: matrix.toolchain == 'mingw'
+        shell: bash
+        run: |
+          g++ --version | head -1
+          g++ -O2 -Wall -static -s -o cmdow.exe args.cpp help.cpp main.cpp tlist.cpp wlist.cpp
+          g++ -O2 -Wall -static -s -o tests/testwin.exe tests/testwin.cpp
+          g++ -O2 -Wall -static -s -o tests/probe.exe tests/probe.cpp
+
+      - name: Build with MSVC
+        if: matrix.toolchain == 'msvc'
+        shell: cmd
+        run: |
+          for /f "usebackq tokens=*" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath`) do set VS=%%i
+          call "%VS%\VC\Auxiliary\Build\vcvars64.bat"
+          cl /nologo /EHsc /W3 /O2 /D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_WARNINGS /Fe:cmdow.exe args.cpp help.cpp main.cpp tlist.cpp wlist.cpp user32.lib advapi32.lib shell32.lib
+          if errorlevel 1 exit /b 1
+          cl /nologo /EHsc /W3 /O2 /Fe:tests\testwin.exe tests\testwin.cpp user32.lib
+          if errorlevel 1 exit /b 1
+          cl /nologo /EHsc /W3 /O2 /Fe:tests\probe.exe tests\probe.cpp user32.lib
+          if errorlevel 1 exit /b 1
+
+      - name: Test against a real window
+        shell: pwsh
+        run: ./tests/run-tests.ps1 -Cmdow ./cmdow.exe -TestWin ./tests/testwin.exe -Probe ./tests/probe.exe
+
+      - name: Keep the executable
+        if: matrix.toolchain == 'mingw'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cmdow-${{ github.sha }}
+          path: cmdow.exe

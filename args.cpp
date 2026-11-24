@@ -24,6 +24,8 @@ void ParseArgs(int argc, char *argv[], struct ARGS *a)
 	a->actopts = 0;
 	a->cc = 0;
 	a->helpcmd = NULL;
+	a->opacity = 100;
+	a->snap = SNAP_NONE;
 	a->myhwnd = GetMyHandle();
 	LoadString(&a->exename, argv[0]);
 
@@ -74,6 +76,29 @@ void ParseArgs(int argc, char *argv[], struct ARGS *a)
 		else if(!lstrcmpi("/CLS", argv[i])) PushTask(a->tasks, CLS);
 		else if(!lstrcmpi("/TOP", argv[i])) PushTask(a->tasks, TOP);
 		else if(!lstrcmpi("/NOT", argv[i])) PushTask(a->tasks, NOT);
+		else if(!lstrcmpi("/CEN", argv[i])) PushTask(a->tasks, CEN);
+		else if(!lstrcmpi("/TRN", argv[i])) {
+			//
+			// next arg MUST be the opacity in percent (1-100)
+			//
+			PushTask(a->tasks, TRN);
+			if( (i+1) < argc) {
+				a->opacity = atoPercent(argv[++i]);
+				if(!a->opacity) Quit(TRNERR);
+			}
+			else Quit(TRNERR);
+		}
+		else if(!lstrcmpi("/SNAP", argv[i])) {
+			//
+			// next arg MUST be left, right, top or bottom
+			//
+			PushTask(a->tasks, SNP);
+			if( (i+1) < argc) {
+				a->snap = atoSnap(argv[++i]);
+				if(!a->snap) Quit(SNPERR);
+			}
+			else Quit(SNPERR);
+		}
 		else if(!lstrcmpi("/MOV", argv[i])) {
 			PushTask(a->tasks, MOV);
 			//
@@ -167,7 +192,8 @@ void ParseArgs(int argc, char *argv[], struct ARGS *a)
 		IsTask(a->tasks, DIS) + IsTask(a->tasks, HID) + IsTask(a->tasks, VIS) +
 		IsTask(a->tasks, END) + IsTask(a->tasks, CLS) + IsTask(a->tasks, REN) +
 		IsTask(a->tasks, MOV) + IsTask(a->tasks, SIZ) + IsTask(a->tasks, TOP) +
-		IsTask(a->tasks, NOT)
+		IsTask(a->tasks, NOT) + IsTask(a->tasks, TRN) + IsTask(a->tasks, CEN) +
+		IsTask(a->tasks, SNP)
 	);
 
 	form2 = ( // op on all windows
@@ -266,6 +292,35 @@ int atoCoord(const char *src)
 	return i;
 }
 
+//
+// Converts an opacity percentage. Returns 1-100, or 0 if the string is not a whole
+// number in that range (0 is rejected as it would make the window invisible)
+//
+int atoPercent(const char *src)
+{
+	int n = 0;
+
+	if(!*src) return 0;
+	while(*src) {
+		if( (*src < '0') || (*src > '9') ) return 0;
+		n = n * 10 + (*src++ - '0');
+		if(n > 100) return 0;
+	}
+	return n;
+}
+
+//
+// Converts left/right/top/bottom to a SNAPTO value, or SNAP_NONE if not recognised
+//
+int atoSnap(const char *src)
+{
+	if(!lstrcmpi("left", src)) return SNAP_LEFT;
+	if(!lstrcmpi("right", src)) return SNAP_RIGHT;
+	if(!lstrcmpi("top", src)) return SNAP_TOP;
+	if(!lstrcmpi("bottom", src)) return SNAP_BOTTOM;
+	return SNAP_NONE;
+}
+
 
 char *LoadString(char **dest, const char *src)
 {
@@ -292,7 +347,9 @@ void Quit(const int Err)
 		"Unable to retrieve image names",									/* BADIMG 9 */
 		"Too many tasks have been specified",								/* TASKOL 10 */
 		"Unable to execute/open specified file",							/* EXEERR 11 */
-		"Only the /? and /RUN commands are supported on W95/98/ME platforms"/* VERERR 12 */
+		"Only the /? and /RUN commands are supported on W95/98/ME platforms",/* VERERR 12 */
+		"/TRN command requires an opacity percentage from 1 to 100",			/* TRNERR 13 */
+		"/SNAP command requires left, right, top or bottom"					/* SNPERR 14 */
 	};
 
 	DWORD cbWritten;
